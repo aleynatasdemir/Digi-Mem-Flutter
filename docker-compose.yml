@@ -1,0 +1,78 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: digimem-postgres
+    environment:
+      POSTGRES_DB: digimem
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app -d digimem" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - digimem-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: digimem-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5299
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=digimem;Username=app;Password=app_pass
+      - Jwt__Secret=your-super-secret-jwt-key-min-32-characters-long-12345
+      - Jwt__Issuer=DigiMem
+      - Jwt__Audience=DigiMemUsers
+      - ADMIN_EMAIL=admin@local
+      - ADMIN_PASSWORD=Admin!12345
+      - CORS__Origins=http://localhost:3000;http://10.0.2.2:5299;http://localhost:5299
+    ports:
+      - "5299:5299"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - digimem-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: digimem-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5299
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:5299/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - digimem-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: digimem-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - digimem-network
+
+volumes:
+  postgres_data:
+
+
+networks:
+  digimem-network:
+    driver: bridge

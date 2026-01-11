@@ -1,0 +1,23 @@
+{
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=5433;Database=digimem;Username=app;Password=app_pass"
+  },
+  "Jwt": {
+    "Secret": "your-super-secret-jwt-key-must-be-at-least-32-characters-long-for-security!"
+  },
+  "Encryption": {
+    "Key": "encryption-key-must-be-32-chars-long-at-least!"
+  },
+  "Spotify": {
+    "ClientId": "your-spotify-client-id",
+    "ClientSecret": "your-spotify-client-secret",
+    "RedirectUri": "https://localhost:5299/oauth/spotify/callback"
+  },
+  "DetailedErrors": true,
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Information"
+    }
+  }
+}
