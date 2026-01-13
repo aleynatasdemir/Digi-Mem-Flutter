@@ -7,11 +7,11 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       primarySwatch: Colors.purple,
-      primaryColor: const Color(0xFF8B5CF6),
-      scaffoldBackgroundColor: const Color(0xFFF5F5F5),
-      textTheme: GoogleFonts.interTextTheme().apply(
-        bodyColor: Colors.black87,
-        displayColor: Colors.black87,
+      primaryColor: const Color(0xFF7b3fcf), // HTML'deki mor renk
+      scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+      textTheme: GoogleFonts.plusJakartaSansTextTheme().apply(
+        bodyColor: const Color(0xFF141019),
+        displayColor: const Color(0xFF141019),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
@@ -33,11 +33,11 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5CF6),
+          backgroundColor: const Color(0xFF7b3fcf),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
@@ -54,7 +54,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Color(0xFF8B5CF6), width: 2),
+          borderSide: BorderSide(color: Color(0xFF7b3fcf), width: 2),
         ),
         labelStyle: TextStyle(color: Colors.black87),
         hintStyle: TextStyle(color: Colors.grey[600]),

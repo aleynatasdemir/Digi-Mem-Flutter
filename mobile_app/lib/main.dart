@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/modern_home_screen.dart';
 import 'services/auth_service.dart';
 import 'services/memory_service.dart';
 import 'services/spotify_service.dart';
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             themeMode: ThemeMode.light,
             home: authService.isAuthenticated
-                ? const HomeScreen()
+                ? const ModernHomeScreen()
                 : const LoginScreen(),
           );
         },

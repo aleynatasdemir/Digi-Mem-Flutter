@@ -67,22 +67,28 @@ class ProfileScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _StatItem(
-                          icon: Icons.photo_library,
-                          label: 'Toplam Anı',
-                          value: totalMemories.toString(),
+                        Flexible(
+                          child: _StatItem(
+                            icon: Icons.photo_library,
+                            label: 'Toplam Anı',
+                            value: totalMemories.toString(),
+                          ),
                         ),
-                        _StatItem(
-                          icon: Icons.calendar_today,
-                          label: 'Bu Ay',
-                          value: _getThisMonthCount(memoryService.memories)
-                              .toString(),
+                        Flexible(
+                          child: _StatItem(
+                            icon: Icons.calendar_today,
+                            label: 'Bu Ay',
+                            value: _getThisMonthCount(memoryService.memories)
+                                .toString(),
+                          ),
                         ),
-                        _StatItem(
-                          icon: Icons.star,
-                          label: 'Bu Hafta',
-                          value: _getThisWeekCount(memoryService.memories)
-                              .toString(),
+                        Flexible(
+                          child: _StatItem(
+                            icon: Icons.star,
+                            label: 'Bu Hafta',
+                            value: _getThisWeekCount(memoryService.memories)
+                                .toString(),
+                          ),
                         ),
                       ],
                     ),
@@ -197,6 +203,7 @@ class _StatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 32, color: Theme.of(context).primaryColor),
         const SizedBox(height: 8),

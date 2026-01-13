@@ -106,16 +106,25 @@ class MemoryService extends ChangeNotifier {
 
   Future<bool> deleteMemory(int id) async {
     try {
+      final url = '${ApiConstants.baseUrl}${ApiConstants.memories}/$id';
+      print('DELETE request to: $url');
+      print('Headers: ${_authService.getAuthHeaders()}');
+      
       final response = await http.delete(
-        Uri.parse('${ApiConstants.baseUrl}${ApiConstants.memories}/$id'),
+        Uri.parse(url),
         headers: _authService.getAuthHeaders(),
       );
+
+      print('DELETE response status: ${response.statusCode}');
+      print('DELETE response body: ${response.body}');
 
       if (response.statusCode == 204 || response.statusCode == 200) {
         _memories.removeWhere((m) => m.id == id);
         notifyListeners();
+        print('Memory deleted successfully from local list');
         return true;
       }
+      print('DELETE failed with status code: ${response.statusCode}');
       return false;
     } catch (e) {
       print('Delete memory error: $e');

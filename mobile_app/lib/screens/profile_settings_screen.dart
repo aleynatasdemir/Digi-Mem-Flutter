@@ -390,60 +390,10 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Account Information
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hesap Bilgisi',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _accountInfoRow('Kullanıcı ID', authService.user?.id ?? '-'),
-                    const SizedBox(height: 12),
-                    _accountInfoRow(
-                      'Üye Olma Tarihi',
-                      authService.user?.createdAt != null
-                          ? '${authService.user!.createdAt.day}/${authService.user!.createdAt.month}/${authService.user!.createdAt.year}'
-                          : '-',
-                    ),
-                  ],
-                ),
-              ),
-            ),
             const SizedBox(height: 32),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _accountInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 13,
-          ),
-        ),
-      ],
     );
   }
 }

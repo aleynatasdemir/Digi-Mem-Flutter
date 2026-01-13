@@ -426,7 +426,7 @@ class _ArchivesScreenState extends State<ArchivesScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 0.8,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),

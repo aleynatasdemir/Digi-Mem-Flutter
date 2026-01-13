@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 import '../models/memory.dart';
 import '../services/memory_service.dart';
+import '../utils/api_constants.dart';
 
 class MemoryDetailScreen extends StatelessWidget {
   final Memory memory;
@@ -47,6 +49,14 @@ class MemoryDetailScreen extends StatelessWidget {
       default:
         return Colors.green;
     }
+  }
+
+  String _getFullUrl(String? url) {
+    if (url == null || url.isEmpty) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return '${ApiConstants.baseUrl}/$url'.replaceAll('//', '/').replaceAll(':/', '://');
   }
 
   @override
@@ -130,7 +140,7 @@ class MemoryDetailScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Media
-            if (memory.fullFileUrl != null) ...[
+            if (memory.fileUrl != null || memory.filePath != null) ...[
               Text(
                 'Ortam Dosyası',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -138,10 +148,15 @@ class MemoryDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: CachedNetworkImage(
-                  imageUrl: memory.fullFileUrl!,
+              if (memory.type.toUpperCase() == 'VIDEO')
+                _VideoPlayerWidget(
+                  videoUrl: _getFullUrl(memory.fileUrl ?? memory.filePath),
+                )
+              else
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: _getFullUrl(memory.fileUrl ?? memory.filePath),
                   width: double.infinity,
                   height: 300,
                   fit: BoxFit.cover,
@@ -389,20 +404,149 @@ class MemoryDetailScreen extends StatelessWidget {
             child: const Text('İptal'),
           ),
           TextButton(
-            onPressed: () {
-              Provider.of<MemoryService>(context, listen: false).deleteMemory(memory.id!);
-              Navigator.pop(context);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Anı silindi'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              final memoryService = Provider.of<MemoryService>(context, listen: false);
+              
+              navigator.pop(); // Dialog'u kapat
+              
+              print('Deleting memory with ID: ${memory.id}');
+              final success = await memoryService.deleteMemory(memory.id!);
+              print('Delete result: $success');
+              
+              if (success) {
+                navigator.pop(); // Detail sayfasını kapat
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Anı başarıyla silindi'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Anı silinirken hata oluştu'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             child: const Text('Sil', style: TextStyle(color: Colors.red)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  const _VideoPlayerWidget({required this.videoUrl});
+
+  @override
+  State<_VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  bool _isInitialized = false;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeVideo();
+  }
+
+  Future<void> _initializeVideo() async {
+    try {
+      _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+      await _controller.initialize();
+      setState(() {
+        _isInitialized = true;
+      });
+    } catch (e) {
+      print('Video initialization error: $e');
+      setState(() {
+        _hasError = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasError) {
+      return Container(
+        height: 300,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red),
+              SizedBox(height: 8),
+              Text('Video yüklenemedi'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (!_isInitialized) {
+      return Container(
+        height: 300,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: AspectRatio(
+        aspectRatio: _controller.value.aspectRatio,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            VideoPlayer(_controller),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (_controller.value.isPlaying) {
+                    _controller.pause();
+                  } else {
+                    _controller.play();
+                  }
+                });
+              },
+              child: Container(
+                color: Colors.transparent,
+                child: Center(
+                  child: Icon(
+                    _controller.value.isPlaying ? Icons.pause_circle_outline : Icons.play_circle_outline,
+                    size: 64,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
